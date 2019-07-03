@@ -1,0 +1,107 @@
+﻿<div class="jumbotron">
+    <div class="addTask">
+        <div>
+            <button class="btn-link" data-toggle="modal" data-target="#myModal">
+                <span class="text-primary"><i class="fa fa-plus" aria-hidden="true"></i>Adicionar nova tarefa</span>
+            </button>
+        </div>
+
+        <div class="modal fade" id="myModal" role="form">
+            <div class="modal-dialog modal-lg">
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title text-center">Nova Tarefa</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <form novalidate name="newTaskForm" ng-submit="vm.addTask()">
+
+                                <div class="form-group">
+                                    <label for="title">Título Tarefa</label>
+                                    <input class="form-control" type="text" id="title" name="title" ng-model="vm.newTask.title" required />
+                                    <span ng-show="newTaskForm.title.$error.required" class="text-warning">Título é requerido</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="description">Descriçao Tarefa</label>
+                                    <textarea class="form-control" type="text" id="description" name="description" ng-model="vm.newTask.description"></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="date">Data Prevista</label>
+                                    <input class="form-control" type="date" id="date" name="date" ng-model="vm.newTask.dueDate" required />
+                                    <span ng-show="newTaskForm.date.$error.required" class="text-warning">Data Prevista é obrigatória</span>
+                                </div>
+                                <div class="form-group">
+                                    <input type="submit" value="Add" class="btn btn-sm btn-success" onclick="$('#myModal').modal('hide');" ng-disabled="newTaskForm.$invalid" />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="modal-footer"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    <br />
+
+
+
+    <div class="text-danger" ng-show="vm.errorMessage">{{ vm.errorMessage }}</div>
+    <div ng-show="vm.isBusy" class="text-center"><i class="fa fa-spinner fa-spin"></i> Carregando...</div>
+    <table class="table table-responsive">
+        <tr ng-repeat="task in vm.tasks" ng-class="{'active' : {{task.status}}, 'text-muted' : {{task.status}}}">
+            <td class="col-sm-2">
+                <button class="btn btn-sm btn-link" ng-mouseenter="task.toggleStatus = true" ng-hide="task.toggleStatus">
+                    <small>{{ task.status ? 'Finalizado' : 'Em Progresso' }}</small>
+                </button>
+                <button class="btn btn-sm btn-link" ng-click="vm.changeStatus(task)" ng-mouseleave="task.toggleStatus = false" ng-show="task.toggleStatus">
+                    <small class="text-success">Mudar Status</small>
+                </button>
+            </td>
+            <td class="col-sm-3">
+                <div>
+                    <p class="title" ng-click="task.viewDescription = !task.viewDescription" ng-hide="task.editing">{{ task.title }}</p>
+                    <div ng-show="task.viewDescription">
+                        <label>{{task.description}}</label>
+                        <label ng-if="task.description.length == null">Sem notas para essa tarefa!</label>
+                    </div>
+                </div>
+                <input class="form-control" ng-show="task.editing" ng-model="task.title" type="text" />
+                <textarea class="form-control" ng-show="task.editing" ng-model="task.description"></textarea>
+            </td>
+            <td class="col-sm-2">
+                <p ng-hide="task.editing">{{ task.dueDate | date }}</p>
+                <input class="form-control" ng-show="task.editing" ng-model="task.dueDate" type="date" value="{{ task.dueDate | date:'dd-MM-yyyy' }}" />
+            </td>
+            <td class="col-sm-offset-4 col-sm-1">
+                <div>
+                    <div class="btn-group btn-group-justified" ng-if="task.status === false">
+                        <div ng-hide="task.editing">
+                            <button class="btn btn-link col-xs-5" ng-click="task.editing = true; task.viewDescription = false">
+                                <span class="text-primary"><i class="fa fa-pencil" aria-hidden="true"></i></span>
+                            </button>
+                            <button class="btn btn-link col-xs-5" ng-click="vm.deleteTask(task.id)">
+                                <span class="text-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></span>
+                            </button>
+                        </div>
+                        <div ng-show="task.editing">
+                            <button class="btn btn-success btn-sm col-xs-6" ng-click="vm.editTask(task)">Salvar</button>
+                            <button class="btn btn-warning btn-sm col-xs-6" ng-click="task.editing = false">Retornar</button>
+                        </div>
+                    </div>
+                    <div ng-if="task.status === true">
+                        <button class="btn btn-link col-xs-offset-5 col-xs-5" ng-click="vm.deleteTask(task.id)">
+                            <span class="text-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></span>
+                        </button>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
